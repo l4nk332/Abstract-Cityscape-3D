@@ -1,0 +1,136 @@
+function initStats() {
+	var stats = new Stats();
+	stats.setMode(0);
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.top = '0px';
+	document.getElementById("Stats-output").appendChild(stats.domElement);
+	return stats;
+}
+
+var controls = new function() {
+	this.cameraX = 180;
+	this.cameraY = 180;
+	this.cameraZ = 180;
+}
+
+var gui = new dat.GUI();
+gui.add(controls, 'cameraX', -380, 380);
+gui.add(controls, 'cameraY', 0, 380);
+gui.add(controls, 'cameraZ', -380, 380);
+
+var camera;
+var renderer;
+
+// once everything is loaded, we run our Three.js stuff.
+function init() {
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+	// create a render and set the size
+	renderer = new THREE.WebGLRenderer();
+
+	renderer.setClearColor(new THREE.Color(0x000000));
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	
+	var stats = initStats();
+	
+	var City = function(width, depth, quadrant) {
+		this.width = width;
+		this.depth = depth;
+		this.scene = new THREE.Scene();
+		this.entities = {};
+		this.landscape = new Landscape(width, depth);
+		// width/quadrant must be odd for even building placement 
+		this.quadrant = quadrant;
+		this.blocks = ((this.width+this.quadrant)/this.quadrant)/2;
+		this.axes = new THREE.AxisHelper(20);
+		this.scene.add(this.axes);
+		var spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 180, 180, 100 );
+		this.scene.add(spotLight);
+		this.scene.fog = new THREE.Fog(0x000000, 0.015, 300);
+		this.add(this.landscape);
+	}
+	
+	City.prototype.add = function(object) {
+		if (!(this.entities.hasOwnProperty(object.type))) {
+			this.entities[object.type] = [];
+		}
+		this.entities[object.type].push(object);
+		this.scene.add(object.mesh);
+	};
+	
+	City.prototype.generateGrid = function() {
+		for (var i = 0; i < this.blocks; i++) {
+			for (var j = 0; j < this.blocks; j++) {
+				var building = new Building(this.quadrant, null, this.quadrant, 0x718e95, true);
+				this.add(building);
+				building.position(2*i*building.width, 0, 2*j*building.depth);
+			}
+		}
+	};
+	
+	var Landscape = function(width, depth) {
+		this.width = width;
+		this.depth = depth;
+		this.type = "landscape";
+		this.geometry = new THREE.PlaneGeometry(this.width, this.depth);
+		this.material = new THREE.MeshBasicMaterial({color: 0x434c51});
+		this.mesh = new THREE.Mesh(this.geometry, this.material);
+		// Set landscape flat at (0, 0, 0)
+		this.mesh.rotation.x = -0.5 * Math.PI;
+		this.mesh.position.x = this.width/2;
+		this.mesh.position.y = 0;
+		this.mesh.position.z = this.depth/2;
+	}
+	
+	var Building = function(width, height=null, depth, color, wireframe=false) {
+		this.width = width;
+		this.height = height || Math.max(Math.ceil(Math.random()*15), 5);
+		this.depth = depth;
+		this.type = "building";
+		this.color = color;
+		this.wireframe = wireframe;
+		this.geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
+		this.texture = THREE.ImageUtils.loadTexture('https://s3-us-west-2.amazonaws.com/s.cdpn.io/322806/concrete.png')
+		this.material = new THREE.MeshLambertMaterial({wireframe: false, map: this.texture});
+		this.mesh = new THREE.Mesh(this.geometry, this.material);
+	};
+	
+	Building.prototype.position = function(x, y, z) {
+		var offsetX = this.width/2;
+		var offsetY = this.height/2;
+		var offsetZ = this.depth/2;
+		this.mesh.position.x = x + offsetX;
+		this.mesh.position.y = y + offsetY;
+		this.mesh.position.z = z + offsetZ;
+	}
+	
+	var city = new City(76, 76, 4);
+	city.generateGrid();
+
+	// add the output of the renderer to the html element
+	document.getElementById("WebGL-output").appendChild(renderer.domElement);
+	
+	// call the render function
+	renderer.render(city.scene, camera);
+	
+	function renderScene() {
+		stats.update();
+		camera.position.x = controls.cameraX;
+		camera.position.y = controls.cameraY;
+		camera.position.z = controls.cameraZ;
+		camera.lookAt(city.scene.position);
+		renderer.render(city.scene, camera);
+		requestAnimationFrame(renderScene);
+	}
+	renderScene();
+}
+window.onload = init;
+
+window.addEventListener('resize', function() {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
