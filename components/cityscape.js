@@ -1,3 +1,4 @@
+"use strict";
 function init() {
 
 	var stats = initStats();
@@ -11,20 +12,41 @@ function init() {
 
 	document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
-	camera.position.x = -30;
-	camera.position.y = 40;
-	camera.position.z = 30;
+	var controls = new function () {
+	    this.cameraX = 0;
+	    this.cameraY = 20;
+	    this.cameraZ = 0;
+	};
+
+	var gui = new dat.GUI();
+	gui.add(controls, 'cameraX', -380, 380);
+	gui.add(controls, 'cameraY', -180, 380);
+	gui.add(controls, 'cameraZ', -380, 380);
+
 
 	var ambientLight = new THREE.AmbientLight(0x0c0c0c);
 
 	// Begin Here....
+	function generateSize(max=10, min=5) {
+	    return Math.floor(Math.max(Math.random()*max, min));
+	}
+
 	var City = function(size, buroughs) {
 	    this.scene = new THREE.Scene();
 	    this.size = size;
 	    this.step = 1;
-	    this.grid = new THREE.GridHelper(this.size, this.step);
+	    this.grid = new Landscape(this.size).mesh;
 	    this.scene.add(this.grid);
 	    this.buroughs = buroughs;
+	}
+
+	var Landscape = function(size) {
+	    this.size = size;
+	    this.geometry = new THREE.PlaneGeometry(size, size);
+	    this.material = new THREE.MeshBasicMaterial({color: 0xeeeeee, wireframe: true});
+	    this.mesh = new THREE.Mesh(this.geometry, this.material);
+	    this.mesh.rotation.x = Math.PI/2;
+	    this.mesh.position.set(this.size/2, 0, this.size/2);
 	}
 
 	var Building = function(type, geometry, material) {
@@ -81,36 +103,21 @@ function init() {
 	    this.group.add(meshB);
 	}
 
+	var axisHelper = new THREE.AxisHelper(10);
 	var cityscape = new City(100, 5);
-
-	// create building
-	var geo = new THREE.BoxGeometry(10, 20, 10);
-	var mat = new THREE.MeshBasicMaterial({color: 0x777777, wireframe: false});
-	var buildingBasic = new Building("basicBox", geo, mat).mesh;
-
-	// create particleCloud
-	var geo2 = new THREE.BoxGeometry(10, 20, 10, 1, 5, 1);
-	var particleBasic = new ParticleCloud(geo2).mesh;
-
-	// group the building and particle cloud
-	var group = new GroupMesh(buildingBasic, particleBasic).group;
-
-	cityscape.scene.add(group);
+	cityscape.scene.add(axisHelper);
+	var building = new Building("basic", new THREE.BoxGeometry(10,10,10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+	cityscape.scene.add(building.mesh);
 	cityscape.scene.add(camera);
-	camera.lookAt(cityscape.scene.position);
 	cityscape.scene.add(ambientLight);
-
-	// var controls = new function () {
-	// 	// control code here...
-	// };
-    //
-	// var gui = new dat.GUI();
-	// gui.add(controls, '', 0, 0.5);
 
 	render();
 
 	function render() {
-	    stats.update();
+		stats.update();
+		camera.position.x = controls.positionX;
+		camera.position.y = controls.positionY;
+		camera.position.z = controls.positionZ;
 
 	    // render using requestAnimationFrame
 	    requestAnimationFrame(render);
