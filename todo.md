@@ -6,9 +6,9 @@
 
 2. Wrap Merged Meshes with ParticleCloud
 
-3. Convert Sky into Particle Cloud
+3. ~~Convert Sky into Particle Cloud~~
 
-4. Switch Plane to BufferPlane / Make Plane reflective.
+4. ~~Switch Plane to BufferPlane~~ / Make Plane reflective.
 
 **Thurs 9/22**
 

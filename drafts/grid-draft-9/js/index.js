@@ -38,30 +38,121 @@ function init() {
 	var stats = initStats();
 
 	var UTILS = {
-		randomValue: function randomValue() {
-			var max = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
-			var min = arguments.length <= 1 || arguments[1] === undefined ? 5 : arguments[1];
-
+		randomValue: function(max=10, min=5) {
 			return Math.floor(Math.max(Math.random() * max, min));
+		},
+		randomRGBA: function() {
+			return "rgba(" +
+				this.randomValue(255) + ", " +
+				this.randomValue(255) + ", " +
+				this.randomValue(255) + ", 1)";
 		}
 	};
 
 	var TEXTURES = {
-		concrete: new THREE.TextureLoader().load("assets/textures/concrete_wall.png")
+		// concrete: new THREE.TextureLoader().load("assets/textures/concrete_wall.png"),
+		concrete: new THREE.ImageUtils.loadTexture("assets/textures/concrete_wall.png"),
+		particle: (function() {
+			var type = "particle";
+			var width = 16;
+			var height = 16;
+			var canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			var context = canvas.getContext('2d');
+			var gradient = context.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+			gradient.addColorStop(0, 'rgba(255,255,255,1)');
+			gradient.addColorStop(0.2, 'rgba(0,255,255,1)');
+			gradient.addColorStop(0.4, 'rgba(0,0,64,1)');
+			gradient.addColorStop(1, 'rgba(0,0,0,1)');
+			context.fillStyle = gradient;
+			context.fillRect(0, 0, width, height);
+			var texture = new THREE.Texture(canvas);
+			texture.needsUpdate = true;
+			return texture;
+		})(),
+		// stars: new THREE.TextureLoader().load("assets/textures/stars.jpg")
+		stars: new THREE.ImageUtils.loadTexture("assets/textures/stars.jpg"),
+		randomParticle: function() {
+			var type = "randomParticle";
+			var width = 16;
+			var height = 16;
+			var canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			var context = canvas.getContext('2d');
+			var gradient = context.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width / 2);
+			gradient.addColorStop(0, 'rgba(255,255,255,1)');
+			gradient.addColorStop(0.2, UTILS.randomRGBA());
+			gradient.addColorStop(0.4, UTILS.randomRGBA());
+			gradient.addColorStop(1, 'rgba(0,0,0,1)');
+			context.fillStyle = gradient;
+			context.fillRect(0, 0, width, height);
+			var texture = new THREE.Texture(canvas);
+			texture.needsUpdate = true;
+			return texture;
+		}
+	};
+
+	var ParticleCloud = function ParticleCloud(geometry) {
+		this.type = "particleCloud";
+		this.geometry = geometry;
+		// Moves pivot point to bottom
+		//this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, (this.geometry.parameters.height)/2, 0));
+		this.texture = TEXTURES.particle;
+		this.material = new THREE.PointCloudMaterial({
+			color: 0xffffff,
+			size: 3,
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			map: this.texture
+		});
+		this.mesh = new THREE.PointCloud(this.geometry, this.material);
+		this.mesh.sortParticles = true;
 	};
 
 	var Sky = function (radius) {
 		this.type = "sky";
-		this.geometry = new THREE.SphereGeometry(radius, 25, 25);
-		this.material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-		// Inner side will render sky
-		this.material.side = THREE.BackSide;
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
+		this.geometry = new THREE.Geometry();
+
+		this.geometryA = new THREE.DodecahedronGeometry(radius, 3);
+		this.meshA = new THREE.Mesh(this.geometryA);
+		this.meshA.updateMatrix();
+		this.geometry.merge(this.geometryA, this.meshA.matrix);
+
+		this.geometryB = new THREE.DodecahedronGeometry(radius, 3);
+		this.meshB = new THREE.Mesh(this.geometryB);
+		this.meshB.rotation.x += Math.PI/4;
+		this.meshB.rotation.y += Math.PI/4;
+		this.meshB.rotation.z += Math.PI/4;
+		this.meshB.updateMatrix();
+		this.geometry.merge(this.geometryB, this.meshB.matrix);
+
+		this.geometryC = new THREE.DodecahedronGeometry(radius, 3);
+		this.meshC = new THREE.Mesh(this.geometryC);
+		this.meshC.rotation.x += Math.PI/4;
+		this.meshC.rotation.y += Math.PI/4;
+		this.meshC.rotation.z += Math.PI/4;
+		this.meshC.updateMatrix();
+		this.geometry.merge(this.geometryC, this.meshC.matrix);
+
+
+		this.texture = TEXTURES.stars;
+		this.texture = TEXTURES.particle;
+		this.material = new THREE.PointCloudMaterial({
+			color: 0xffffff,
+			size: 7,
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			map: this.texture
+		});
+		this.mesh = new THREE.PointCloud(this.geometry, this.material);
+		this.mesh.sortParticles = true;
 	};
 
 	Sky.prototype.surround = function (object) {
-		var offsetX = object.width / 2;
-		var offsetY = object.depth / 2;
+		var offsetX = object.size / 2;
+		var offsetY = object.size / 2;
 		this.mesh.position.set(offsetX, 0, offsetY);
 	};
 
@@ -110,6 +201,8 @@ function init() {
 		this.maxBuildingDepth = maxBuildingDepth;
 		this.geometry = new THREE.Geometry();
 		this.material = new THREE.MeshLambertMaterial({map: TEXTURES.concrete});
+		// this.material = new THREE.MeshStandardMaterial({roughness: 0, metalness: 1, emissive: 0x333333, map: TEXTURES.concrete});
+		//this.material = new THREE.MeshPhongMaterial({roughness: 0, metalness: 1, emissive: 0x333333, wireframe: true});
 	};
 
 	Borough.prototype.generateBlock = function () {
@@ -125,7 +218,6 @@ function init() {
 				block.position(2 * i * block.size, 0, 2 * j * block.size);
 				block.mesh.updateMatrix();
 				this.geometry.merge(block.geometry, block.mesh.matrix);
-
 				this.mesh = new THREE.Mesh(this.geometry, this.material);
 			}
 		}
@@ -180,7 +272,7 @@ function init() {
 		building.mesh.updateMatrix();
 		this.geometry.merge(building.geometry, building.mesh.matrix);
 
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
+		this.mesh = new THREE.Mesh(this.geometry);
 	};
 
 	Block.prototype.fillSpace = function () {
@@ -211,8 +303,11 @@ function init() {
 		this.width = width;
 		this.depth = depth;
 		this.type = "landscape";
-		this.geometry = new THREE.PlaneGeometry(this.width, this.depth);
-		this.material = new THREE.MeshBasicMaterial({ color: 0x434c51 });
+		this.geometry = new THREE.PlaneBufferGeometry(this.width, this.depth, 20, 20);
+		//this.materialA = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe:true, wireframeLinewidth: 2});
+		this.material = new THREE.MeshBasicMaterial({color: 0xdddddd, opacity: 0.7, transparent: true});
+		//this.materials = [this.materialA, this.materialB];
+		//this.mesh = new THREE.SceneUtils.createMultiMaterialObject(this.geometry, this.materials);
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
 		// Set landscape flat at (0, 0, 0)
 		this.mesh.rotation.x = -0.5 * Math.PI;
@@ -233,45 +328,6 @@ function init() {
 		this.geometry.faces.splice(6, 1);
 		this.mesh = new THREE.Mesh(this.geometry);
 	};
-
-	// var Particle = function Particle() {
-	// 	var width = arguments.length <= 0 || arguments[0] === undefined ? 16 : arguments[0];
-	// 	var height = arguments.length <= 1 || arguments[1] === undefined ? 16 : arguments[1];
-	//
-	// 	this.type = "particle";
-	// 	this.width = width;
-	// 	this.height = height;
-	// 	this.canvas = document.createElement('canvas');
-	// 	this.canvas.width = this.width;
-	// 	this.canvas.height = this.height;
-	// 	this.context = this.canvas.getContext('2d');
-	// 	this.gradient = this.context.createRadialGradient(this.width / 2, this.height / 2, 0, this.width / 2, this.height / 2, this.width / 2);
-	// 	this.gradient.addColorStop(0, 'rgba(255,255,255,1)');
-	// 	this.gradient.addColorStop(0.2, 'rgba(0,255,255,1)');
-	// 	this.gradient.addColorStop(0.4, 'rgba(0,0,64,1)');
-	// 	this.gradient.addColorStop(1, 'rgba(0,0,0,1)');
-	// 	this.context.fillStyle = this.gradient;
-	// 	this.context.fillRect(0, 0, this.width, this.height);
-	// 	this.texture = new THREE.Texture(this.canvas);
-	// 	this.texture.needsUpdate = true;
-	// };
-	//
-	// var ParticleCloud = function ParticleCloud(structure) {
-	// 	this.type = "particleCloud";
-	// 	this.geometry = structure.geometry.clone();
-	// 	// Moves pivot point to bottom
-	// 	//this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, (this.geometry.parameters.height)/2, 0));
-	// 	this.texture = new Particle().texture;
-	// 	this.material = new THREE.PointCloudMaterial({
-	// 		color: 0xffffff,
-	// 		size: 3,
-	// 		transparent: true,
-	// 		blending: THREE.AdditiveBlending,
-	// 		map: this.texture
-	// 	});
-	// 	this.mesh = new THREE.PointCloud(this.geometry, this.material);
-	// 	this.mesh.sortParticles = true;
-	// };
 
 	var Building = function (structure) {
 		this.type = "building";
@@ -314,6 +370,13 @@ function init() {
 		camera.position.y = controls.cameraY;
 		camera.position.z = controls.cameraZ;
 		camera.lookAt(new THREE.Vector3(city.size / 2, 0, city.size / 2));
+		sky.mesh.rotation.x += 0.0003;
+		sky.mesh.rotation.y += 0.0005;
+		sky.mesh.rotation.z += 0.0003;
+
+		sky.mesh.material.map = TEXTURES.randomParticle();
+		sky.mesh.material.map.needsUpdate = true;
+
 		renderer.render(city.scene, camera);
 		requestAnimationFrame(renderScene);
 	}
