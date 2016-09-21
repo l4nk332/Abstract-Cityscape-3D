@@ -2,7 +2,7 @@
 
 **Wed 9/21**
 
-1. Merge Structures within a Block and merge Blocks within Boroughs.
+1. ~~Merge Structures within a Block and merge Blocks within Boroughs.~~
 
 2. Wrap Merged Meshes with ParticleCloud
 
