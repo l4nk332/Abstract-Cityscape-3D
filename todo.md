@@ -4,7 +4,7 @@
 
 1. ~~Merge Structures within a Block and merge Blocks within Boroughs.~~
 
-2. Wrap Merged Meshes with ParticleCloud
+2. ~~Set variation on building geometries~~
 
 3. ~~Convert Sky into Particle Cloud~~
 
@@ -12,9 +12,9 @@
 
 **Thurs 9/22**
 
-5. Set up lighting for the city.
+5. Set up lighting for the city / decorate buildings (map/particles/wireframe).
 
-6. Set variation on building geometries
+6. Set up the height build/grid topography
 
 7. Set up Orbit camera
 
