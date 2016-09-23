@@ -12,31 +12,30 @@
 
 **Thurs 9/22**
 
-5. Set up lighting for the city / decorate buildings (map/particles/wireframe).
+5. ~~Set up the height build/grid topography~~
 
-6. ~~Set up the height build/grid topography~~
-
-7. Set up Orbit camera
-
-8. Set up First Person camera
-
-9. Set up Fly Over camera
-
-10. Allow user to switch between cameras
-
-11. Perhaps add fog???
 
 **Fri 9/23**
 
-12. Add music to sequence of camera movements/music visualization
+6. ~~Set up Orbit camera~~
 
-13. Add Street lights.
+7. Set up First Person camera
+
+8. Set up Fly Over camera
+
+9. Allow user to switch between cameras
+
+10. Set up lighting for the city / decorate buildings (map/particles/wireframe).
+
+11. Perhaps add fog???
+
+12. Add music to sequence of camera movements/music visualization
 
 **Sat 9/24**
 
-14. Post processing: Work on Depth of Field
+13. Post processing: Work on Depth of Field
 
-15. Post processing: Work on grain
+14. Post processing: Work on grain
 
-16. Post processing: Work on advanced shaders
+15. Post processing: Work on advanced shaders
 
