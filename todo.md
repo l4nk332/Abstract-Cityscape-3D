@@ -19,23 +19,21 @@
 
 6. ~~Set up Orbit camera~~
 
-7. Set up First Person camera
+7. ~~Set up Fly Over camera~~
 
-8. Set up Fly Over camera
+8. Allow user to switch between cameras
 
-9. Allow user to switch between cameras
+9. Set up lighting for the city / decorate buildings (map/particles/wireframe).
 
-10. Set up lighting for the city / decorate buildings (map/particles/wireframe).
+10. Perhaps add fog???
 
-11. Perhaps add fog???
-
-12. Add music to sequence of camera movements/music visualization
+11. Add music to sequence of camera movements/music visualization
 
 **Sat 9/24**
 
-13. Post processing: Work on Depth of Field
+12. Post processing: Work on Depth of Field
 
-14. Post processing: Work on grain
+13. Post processing: Work on grain
 
-15. Post processing: Work on advanced shaders
+14. Post processing: Work on advanced shaders
 
