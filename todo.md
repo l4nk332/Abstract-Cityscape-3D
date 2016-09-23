@@ -21,7 +21,7 @@
 
 7. ~~Set up Fly Over camera~~
 
-8. Allow user to switch between cameras
+8. ~~Allow user to switch between cameras~~
 
 9. Set up lighting for the city / decorate buildings (map/particles/wireframe).
 
