@@ -14,7 +14,7 @@
 
 5. Set up lighting for the city / decorate buildings (map/particles/wireframe).
 
-6. Set up the height build/grid topography
+6. ~~Set up the height build/grid topography~~
 
 7. Set up Orbit camera
 
