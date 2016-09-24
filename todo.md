@@ -23,17 +23,19 @@
 
 8. ~~Allow user to switch between cameras~~
 
-9. Set up lighting for the city / decorate buildings (map/particles/wireframe).
+9. ~~Set up lighting for the city~~
 
-10. Perhaps add fog???
+10. decorate buildings (map/particles/wireframe).
 
-11. Add music to sequence of camera movements/music visualization
+11. Perhaps add fog???
+
+12. Add music to sequence of camera movements/music visualization
 
 **Sat 9/24**
 
-12. Post processing: Work on Depth of Field
+13. Post processing: Work on Depth of Field
 
-13. Post processing: Work on grain
+14. Post processing: Work on grain
 
-14. Post processing: Work on advanced shaders
+15. Post processing: Work on advanced shaders
 
