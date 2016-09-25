@@ -26,6 +26,14 @@ function keyPressFunctions(event) {
 		camMode = "orbitManual";
 	}
 
+	if (event.keyCode == 57) {
+		if (hemiLight.intensity === 0) {
+			hemiLight.intensity = 0.6;
+		} else {
+			hemiLight.intensity = 0;
+		}
+	}
+
 	if (event.keyCode == 48) {
 		if (audio.paused) {
 			audio.play();
@@ -67,6 +75,7 @@ function incrementStructureCount() {
 var orbitCamera;
 var orbitManual;
 var flyCamera;
+var hemiLight;
 var renderer;
 var camMode = "orbit";
 var structureCount = 0;
@@ -474,18 +483,22 @@ function init() {
 	// ======
 	// Lights
 	// ======
-	var hemiLight = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
+	// hemiLight defined globally
+	hemiLight = new THREE.HemisphereLight(0xcd165a, 0x630ccf, 0.6);
 	hemiLight.position.set(0, 500, 0);
 	city.scene.add(hemiLight);
 
 	var pointLight = new THREE.PointLight(0xf0e48a, 2, 350);
+	pointLight.decay = 1;
 	pointLight.position.set(750, -15, 750);
 	city.scene.add(pointLight);
-	var sphereSize = 5;
-	var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
-	city.scene.add( pointLightHelper );
 
 	var spotLightA = new THREE.SpotLight(0xffff00);
+	spotLightA.intensity = 2.6;
+	spotLightA.distance = 1500;
+	spotLightA.decay = 2;
+	spotLightA.angle = Math.PI/2;
+	spotLightA.penumbra = 0;
 	spotLightA.position.set(-50, 100, -50);
 	var spotATarget = new THREE.Object3D();
 	spotATarget.position.set(50, 0, 50);
@@ -494,6 +507,11 @@ function init() {
 	city.scene.add(spotLightA);
 
 	var spotLightB = new THREE.SpotLight(0xff0000);
+	spotLightB.intensity = 2.6;
+	spotLightB.distance = 1500;
+	spotLightB.decay = 2;
+	spotLightB.angle = Math.PI/2;
+	spotLightB.penumbra = 0;
 	spotLightB.position.set(-50, 100, 1550);
 	var spotBTarget = new THREE.Object3D();
 	spotBTarget.position.set(50, 0, 1450);
@@ -502,6 +520,11 @@ function init() {
 	city.scene.add(spotLightB);
 
 	var spotLightC= new THREE.SpotLight(0x00ff00);
+	spotLightC.intensity = 2.6;
+	spotLightC.distance = 1500;
+	spotLightC.decay = 2;
+	spotLightC.angle = Math.PI/2;
+	spotLightC.penumbra = 0;
 	spotLightC.position.set(1550, 100, 1550);
 	var spotCTarget = new THREE.Object3D();
 	spotCTarget.position.set(1450, 0, 1450);
@@ -510,6 +533,11 @@ function init() {
 	city.scene.add(spotLightC);
 
 	var spotLightD = new THREE.SpotLight(0x0000ff);
+	spotLightD.intensity = 2.6;
+	spotLightD.distance = 1500;
+	spotLightD.decay = 2;
+	spotLightD.angle = Math.PI/2;
+	spotLightD.penumbra = 0;
 	spotLightD.position.set(1550, 100, -50);
 	var spotDTarget = new THREE.Object3D();
 	spotDTarget.position.set(1450, 0, 50);
@@ -523,14 +551,14 @@ function init() {
 	orbitCamera.position.x = -200;
 	orbitCamera.position.y = 200;
 	orbitCamera.position.z = 200;
-	var orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
+	var orbitControls = new THREE.OrbitControls(orbitCamera);
 	orbitControls.autoRotate = true;
 	orbitControls.center.set(city.landscape.mesh.position.x, 50, city.landscape.mesh.position.z);
 
 	orbitManual.position.x = -200;
 	orbitManual.position.y = 200;
 	orbitManual.position.z = 200;
-	var orbitManualControls = new THREE.OrbitControls(orbitManual, renderer.domElement);
+	var orbitManualControls = new THREE.OrbitControls(orbitManual);
 	orbitManualControls.autoRotate = false;
 	orbitManualControls.center.set(city.landscape.mesh.position.x, 50, city.landscape.mesh.position.z);
 
@@ -538,7 +566,7 @@ function init() {
 	flyCamera.position.y = 300;
 	flyCamera.position.z = 0;
 	flyCamera.lookAt(new THREE.Vector3(city.size / 2, 0, city.size / 2));
-	var flyControls = new THREE.FlyControls(flyCamera, renderer.domElement);
+	var flyControls = new THREE.FlyControls(flyCamera);
 	flyControls.movementSpeed = 100;
 	flyControls.domElement = document.querySelector("#WebGL-output");
 	flyControls.rollSpeed = Math.PI/14;
@@ -549,262 +577,264 @@ function init() {
 	// ========
 	// Controls
 	// ========
-	var controls = new function () { // jshint ignore: line
-		// Hemi light controls
-		this.hemisphere = true;
-		this.hemiColor = 0xe2dede;
-		this.hemiSkyColor = 0xcdc9c9;
-		this.hemiIntensity = 0.6;
-		// PointLight Controls
-		this.point = true;
-		this.pointColor = 0xf0e48a;
-		this.pointIntesity = 2;
-		this.pointDistance = 350;
-		this.pointDecay = 1;
-		this.pointX = 750;
-		this.pointY = -15;
-		this.pointZ = 750;
-		// SpotLight A
-		this.spotA = true;
-		this.spotAColor = 0xffff00;
-		this.spotAIntesity = 2.6;
-		this.spotADistance = 1500;
-		this.spotADecay = 2;
-		this.spotAAngle = Math.PI/2;
-		this.spotAPenumbra = 0;
-		this.spotAX = -50;
-		this.spotAY = 75;
-		this.spotAZ = -50;
-		// SpotLight B
-		this.spotB = true;
-		this.spotBColor = 0xff0000;
-		this.spotBIntesity = 2.6;
-		this.spotBDistance = 1500;
-		this.spotBDecay = 2;
-		this.spotBAngle = Math.PI/2;
-		this.spotBPenumbra = 0;
-		this.spotBX = -50;
-		this.spotBY = 75;
-		this.spotBZ = 1550;
-		// SpotLight C
-		this.spotC = true;
-		this.spotCColor = 0x00ff00;
-		this.spotCIntesity = 2.6;
-		this.spotCDistance = 1500;
-		this.spotCDecay = 2;
-		this.spotCAngle = Math.PI/2;
-		this.spotCPenumbra = 0;
-		this.spotCX = 1550;
-		this.spotCY = 75;
-		this.spotCZ = 1550;
-		// SpotLight D
-		this.spotD = true;
-		this.spotDColor = 0x0000ff;
-		this.spotDIntesity = 2.6;
-		this.spotDDistance = 1500;
-		this.spotDDecay = 2;
-		this.spotDAngle = Math.PI/2;
-		this.spotDPenumbra = 0;
-		this.spotDX = 1550;
-		this.spotDY = 75;
-		this.spotDZ = -50;
-	}; // jshint ignore: line
+	// var controls = new function () { // jshint ignore: line
+	// 	// Hemi light controls
+	// 	this.hemisphere = true;
+		// this.hemiColor = 0xe2dede;
+		// this.hemiSkyColor = 0xcdc9c9;
+	// 	this.hemiIntensity = 0.6;
+	// 	// PointLight Controls
+	// 	this.point = true;
+	// 	this.pointColor = 0xf0e48a;
+	// 	this.pointIntesity = 2;
+	// 	this.pointDistance = 350;
+	// 	this.pointDecay = 1;
+	// 	this.pointX = 750;
+	// 	this.pointY = -15;
+	// 	this.pointZ = 750;
+	// 	// SpotLight A
+	// 	this.spotA = true;
+	// 	this.spotAColor = 0xffff00;
+	// 	this.spotAIntesity = 2.6;
+	// 	this.spotADistance = 1500;
+	// 	this.spotADecay = 2;
+	// 	this.spotAAngle = Math.PI/2;
+	// 	this.spotAPenumbra = 0;
+	// 	this.spotAX = -50;
+	// 	this.spotAY = 75;
+	// 	this.spotAZ = -50;
+	// 	// SpotLight B
+	// 	this.spotB = true;
+	// 	this.spotBColor = 0xff0000;
+	// 	this.spotBIntesity = 2.6;
+	// 	this.spotBDistance = 1500;
+	// 	this.spotBDecay = 2;
+	// 	this.spotBAngle = Math.PI/2;
+	// 	this.spotBPenumbra = 0;
+	// 	this.spotBX = -50;
+	// 	this.spotBY = 75;
+	// 	this.spotBZ = 1550;
+	// 	// SpotLight C
+	// 	this.spotC = true;
+	// 	this.spotCColor = 0x00ff00;
+	// 	this.spotCIntesity = 2.6;
+	// 	this.spotCDistance = 1500;
+	// 	this.spotCDecay = 2;
+	// 	this.spotCAngle = Math.PI/2;
+	// 	this.spotCPenumbra = 0;
+	// 	this.spotCX = 1550;
+	// 	this.spotCY = 75;
+	// 	this.spotCZ = 1550;
+	// 	// SpotLight D
+	// 	this.spotD = true;
+	// 	this.spotDColor = 0x0000ff;
+	// 	this.spotDIntesity = 2.6;
+	// 	this.spotDDistance = 1500;
+	// 	this.spotDDecay = 2;
+	// 	this.spotDAngle = Math.PI/2;
+	// 	this.spotDPenumbra = 0;
+	// 	this.spotDX = 1550;
+	// 	this.spotDY = 75;
+	// 	this.spotDZ = -50;
+	// }; // jshint ignore: line
 
-	var gui = new dat.GUI();
+	// var gui = new dat.GUI();
+	//
+	// var hemiFolder = gui.addFolder("Hemisphere Light");
+	// hemiFolder.add(controls, 'hemisphere').onChange(function (e) {
+	// 	if (!e) {
+	// 		hemiLight.intensity = 0;
+	// 	} else {
+	// 		hemiLight.intensity = controls.hemiIntensity;
+	// 	}
+	// });
+	// hemiFolder.addColor(controls, 'hemiColor').onChange(function (e) {
+	// 	hemiLight.groundColor = new THREE.Color(e);
+	// });
+	// hemiFolder.addColor(controls, 'hemiSkyColor').onChange(function (e) {
+	// 	hemiLight.color = new THREE.Color(e);
+	// });
+	// hemiFolder.add(controls, 'hemiIntensity', 0, 5).onChange(function (e) {
+	// 	hemiLight.intensity = e;
+	// });
+	//
+	// var pointFolder = gui.addFolder("Point Light");
+	// pointFolder.add(controls, 'point').onChange(function(e) {
+	// 	if (!e) {
+	// 		pointLight.intensity = 0;
+	// 	} else {
+	// 		pointLight.intensity = controls.pointIntesity;
+	// 	}
+	// });
+	// pointFolder.addColor(controls, 'pointColor').onChange(function(e) {
+	// 	pointLight.color = new THREE.Color(e);
+	// });
+	// pointFolder.add(controls, 'pointIntesity', 0, 20).onChange(function(e) {
+	// 	pointLight.intensity = e;
+	// });
+	// pointFolder.add(controls, 'pointDistance', 0, 1500).onChange(function(e) {
+	// 	pointLight.distance = e;
+	// });
+	// pointFolder.add(controls, 'pointDecay', 0, 10).onChange(function(e) {
+	// 	pointLight.decay = e;
+	// });
+	// pointFolder.add(controls, 'pointX', 0, 1500).onChange(function(e) {
+	// 	pointLight.position.set(e, controls.pointY, controls.pointZ);
+	// });
+	// pointFolder.add(controls, 'pointY', -30, 150).onChange(function(e) {
+	// 	pointLight.position.set(controls.pointX, e, controls.pointZ);
+	// });
+	// pointFolder.add(controls, 'pointZ', 0, 1500).onChange(function(e) {
+	// 	pointLight.position.set(controls.pointX, controls.pointY, e);
+	// });
+	//
+	// var spotAFolder = gui.addFolder("Spot Light A");
+	// spotAFolder.add(controls, 'spotA').onChange(function(e) {
+	// 	if (!e) {
+	// 		spotLightA.intensity = 0;
+	// 	} else {
+	// 		spotLightA.intensity = controls.spotAIntesity;
+	// 	}
+	// });
+	// spotAFolder.addColor(controls, 'spotAColor').onChange(function(e) {
+	// 	spotLightA.color = new THREE.Color(e);
+	// });
+	// spotAFolder.add(controls, 'spotAIntesity', 0, 20).onChange(function(e) {
+	// 	spotLightA.intensity = e;
+	// });
+	// spotAFolder.add(controls, 'spotADistance', 0, 1500).onChange(function(e) {
+	// 	spotLightA.distance = e;
+	// });
+	// spotAFolder.add(controls, 'spotADecay', 0, 10).onChange(function(e) {
+	// 	spotLightA.decay = e;
+	// });
+	// spotAFolder.add(controls, 'spotAAngle', 0, Math.PI/2).onChange(function(e) {
+	// 	spotLightA.angle = e;
+	// });
+	// spotAFolder.add(controls, 'spotAPenumbra', 0, 1).onChange(function(e) {
+	// 	spotLightA.penumbra = e;
+	// });
+	// spotAFolder.add(controls, 'spotAX', -100, 1600).onChange(function(e) {
+	// 	spotLightA.position.set(e, controls.spotAY, controls.spotAZ);
+	// });
+	// spotAFolder.add(controls, 'spotAY', -30, 150).onChange(function(e) {
+	// 	spotLightA.position.set(controls.spotAX, e, controls.spotAZ);
+	// });
+	// spotAFolder.add(controls, 'spotAZ', -100, 1600).onChange(function(e) {
+	// 	spotLightA.position.set(controls.spotAX, controls.spotAY, e);
+	// });
+	//
+	// var spotBFolder = gui.addFolder("Spot Light B");
+	// spotBFolder.add(controls, 'spotB').onChange(function(e) {
+	// 	if (!e) {
+	// 		spotLightB.intensity = 0;
+	// 	} else {
+	// 		spotLightB.intensity = controls.spotAIntesity;
+	// 	}
+	// });
+	// spotBFolder.addColor(controls, 'spotBColor').onChange(function(e) {
+	// 	spotLightB.color = new THREE.Color(e);
+	// });
+	// spotBFolder.add(controls, 'spotBIntesity', 0, 20).onChange(function(e) {
+	// 	spotLightB.intensity = e;
+	// });
+	// spotBFolder.add(controls, 'spotBDistance', 0, 1500).onChange(function(e) {
+	// 	spotLightB.distance = e;
+	// });
+	// spotBFolder.add(controls, 'spotBDecay', 0, 10).onChange(function(e) {
+	// 	spotLightB.decay = e;
+	// });
+	// spotBFolder.add(controls, 'spotBAngle', 0, Math.PI/2).onChange(function(e) {
+	// 	spotLightB.angle = e;
+	// });
+	// spotBFolder.add(controls, 'spotBPenumbra', 0, 1).onChange(function(e) {
+	// 	spotLightB.penumbra = e;
+	// });
+	// spotBFolder.add(controls, 'spotBX', -100, 1600).onChange(function(e) {
+	// 	spotLightB.position.set(e, controls.spotBY, controls.spotBZ);
+	// });
+	// spotBFolder.add(controls, 'spotBY', -30, 150).onChange(function(e) {
+	// 	spotLightB.position.set(controls.spotBX, e, controls.spotBZ);
+	// });
+	// spotBFolder.add(controls, 'spotBZ', -100, 1600).onChange(function(e) {
+	// 	spotLightB.position.set(controls.spotBX, controls.spotBY, e);
+	// });
+	//
+	// var spotCFolder = gui.addFolder("Spot Light C");
+	// spotCFolder.add(controls, 'spotC').onChange(function(e) {
+	// 	if (!e) {
+	// 		spotLightC.intensity = 0;
+	// 	} else {
+	// 		spotLightC.intensity = controls.spotAIntesity;
+	// 	}
+	// });
+	// spotCFolder.addColor(controls, 'spotCColor').onChange(function(e) {
+	// 	spotLightC.color = new THREE.Color(e);
+	// });
+	// spotCFolder.add(controls, 'spotCIntesity', 0, 20).onChange(function(e) {
+	// 	spotLightC.intensity = e;
+	// });
+	// spotCFolder.add(controls, 'spotCDistance', 0, 1500).onChange(function(e) {
+	// 	spotLightC.distance = e;
+	// });
+	// spotCFolder.add(controls, 'spotCDecay', 0, 10).onChange(function(e) {
+	// 	spotLightC.decay = e;
+	// });
+	// spotCFolder.add(controls, 'spotCAngle', 0, Math.PI/2).onChange(function(e) {
+	// 	spotLightC.angle = e;
+	// });
+	// spotCFolder.add(controls, 'spotCPenumbra', 0, 1).onChange(function(e) {
+	// 	spotLightC.penumbra = e;
+	// });
+	// spotCFolder.add(controls, 'spotCX', -100, 1600).onChange(function(e) {
+	// 	spotLightC.position.set(e, controls.spotCY, controls.spotCZ);
+	// });
+	// spotCFolder.add(controls, 'spotCY', -30, 150).onChange(function(e) {
+	// 	spotLightC.position.set(controls.spotCX, e, controls.spotCZ);
+	// });
+	// spotCFolder.add(controls, 'spotCZ', -100, 1600).onChange(function(e) {
+	// 	spotLightC.position.set(controls.spotCX, controls.spotCY, e);
+	// });
+	//
+	// var spotDFolder = gui.addFolder("Spot Light D");
+	// spotDFolder.add(controls, 'spotD').onChange(function(e) {
+	// 	if (!e) {
+	// 		spotLightD.intensity = 0;
+	// 	} else {
+	// 		spotLightD.intensity = controls.spotAIntesity;
+	// 	}
+	// });
+	// spotDFolder.addColor(controls, 'spotDColor').onChange(function(e) {
+	// 	spotLightD.color = new THREE.Color(e);
+	// });
+	// spotDFolder.add(controls, 'spotDIntesity', 0, 20).onChange(function(e) {
+	// 	spotLightD.intensity = e;
+	// });
+	// spotDFolder.add(controls, 'spotDDistance', 0, 1500).onChange(function(e) {
+	// 	spotLightD.distance = e;
+	// });
+	// spotDFolder.add(controls, 'spotDDecay', 0, 10).onChange(function(e) {
+	// 	spotLightD.decay = e;
+	// });
+	// spotDFolder.add(controls, 'spotDAngle', 0, Math.PI/2).onChange(function(e) {
+	// 	spotLightD.angle = e;
+	// });
+	// spotDFolder.add(controls, 'spotDPenumbra', 0, 1).onChange(function(e) {
+	// 	spotLightD.penumbra = e;
+	// });
+	// spotDFolder.add(controls, 'spotDX', -100, 1600).onChange(function(e) {
+	// 	spotLightD.position.set(e, controls.spotDY, controls.spotDZ);
+	// });
+	// spotDFolder.add(controls, 'spotDY', -30, 150).onChange(function(e) {
+	// 	spotLightD.position.set(controls.spotDX, e, controls.spotDZ);
+	// });
+	// spotDFolder.add(controls, 'spotDZ', -100, 1600).onChange(function(e) {
+	// 	spotLightD.position.set(controls.spotDX, controls.spotDY, e);
+	// });
+	//
+	// console.log(structureCount);
 
-	var hemiFolder = gui.addFolder("Hemisphere Light");
-	hemiFolder.add(controls, 'hemisphere').onChange(function (e) {
-		if (!e) {
-			hemiLight.intensity = 0;
-		} else {
-			hemiLight.intensity = controls.hemiIntensity;
-		}
-	});
-	hemiFolder.addColor(controls, 'hemiColor').onChange(function (e) {
-		hemiLight.groundColor = new THREE.Color(e);
-	});
-	hemiFolder.addColor(controls, 'hemiSkyColor').onChange(function (e) {
-		hemiLight.color = new THREE.Color(e);
-	});
-	hemiFolder.add(controls, 'hemiIntensity', 0, 5).onChange(function (e) {
-		hemiLight.intensity = e;
-	});
 
-	var pointFolder = gui.addFolder("Point Light");
-	pointFolder.add(controls, 'point').onChange(function(e) {
-		if (!e) {
-			pointLight.intensity = 0;
-		} else {
-			pointLight.intensity = controls.pointIntesity;
-		}
-	});
-	pointFolder.addColor(controls, 'pointColor').onChange(function(e) {
-		pointLight.color = new THREE.Color(e);
-	});
-	pointFolder.add(controls, 'pointIntesity', 0, 20).onChange(function(e) {
-		pointLight.intensity = e;
-	});
-	pointFolder.add(controls, 'pointDistance', 0, 1500).onChange(function(e) {
-		pointLight.distance = e;
-	});
-	pointFolder.add(controls, 'pointDecay', 0, 10).onChange(function(e) {
-		pointLight.decay = e;
-	});
-	pointFolder.add(controls, 'pointX', 0, 1500).onChange(function(e) {
-		pointLight.position.set(e, controls.pointY, controls.pointZ);
-	});
-	pointFolder.add(controls, 'pointY', -30, 150).onChange(function(e) {
-		pointLight.position.set(controls.pointX, e, controls.pointZ);
-	});
-	pointFolder.add(controls, 'pointZ', 0, 1500).onChange(function(e) {
-		pointLight.position.set(controls.pointX, controls.pointY, e);
-	});
-
-	var spotAFolder = gui.addFolder("Spot Light A");
-	spotAFolder.add(controls, 'spotA').onChange(function(e) {
-		if (!e) {
-			spotLightA.intensity = 0;
-		} else {
-			spotLightA.intensity = controls.spotAIntesity;
-		}
-	});
-	spotAFolder.addColor(controls, 'spotAColor').onChange(function(e) {
-		spotLightA.color = new THREE.Color(e);
-	});
-	spotAFolder.add(controls, 'spotAIntesity', 0, 20).onChange(function(e) {
-		spotLightA.intensity = e;
-	});
-	spotAFolder.add(controls, 'spotADistance', 0, 1500).onChange(function(e) {
-		spotLightA.distance = e;
-	});
-	spotAFolder.add(controls, 'spotADecay', 0, 10).onChange(function(e) {
-		spotLightA.decay = e;
-	});
-	spotAFolder.add(controls, 'spotAAngle', 0, Math.PI/2).onChange(function(e) {
-		spotLightA.angle = e;
-	});
-	spotAFolder.add(controls, 'spotAPenumbra', 0, 1).onChange(function(e) {
-		spotLightA.penumbra = e;
-	});
-	spotAFolder.add(controls, 'spotAX', -100, 1600).onChange(function(e) {
-		spotLightA.position.set(e, controls.spotAY, controls.spotAZ);
-	});
-	spotAFolder.add(controls, 'spotAY', -30, 150).onChange(function(e) {
-		spotLightA.position.set(controls.spotAX, e, controls.spotAZ);
-	});
-	spotAFolder.add(controls, 'spotAZ', -100, 1600).onChange(function(e) {
-		spotLightA.position.set(controls.spotAX, controls.spotAY, e);
-	});
-
-	var spotBFolder = gui.addFolder("Spot Light B");
-	spotBFolder.add(controls, 'spotB').onChange(function(e) {
-		if (!e) {
-			spotLightB.intensity = 0;
-		} else {
-			spotLightB.intensity = controls.spotAIntesity;
-		}
-	});
-	spotBFolder.addColor(controls, 'spotBColor').onChange(function(e) {
-		spotLightB.color = new THREE.Color(e);
-	});
-	spotBFolder.add(controls, 'spotBIntesity', 0, 20).onChange(function(e) {
-		spotLightB.intensity = e;
-	});
-	spotBFolder.add(controls, 'spotBDistance', 0, 1500).onChange(function(e) {
-		spotLightB.distance = e;
-	});
-	spotBFolder.add(controls, 'spotBDecay', 0, 10).onChange(function(e) {
-		spotLightB.decay = e;
-	});
-	spotBFolder.add(controls, 'spotBAngle', 0, Math.PI/2).onChange(function(e) {
-		spotLightB.angle = e;
-	});
-	spotBFolder.add(controls, 'spotBPenumbra', 0, 1).onChange(function(e) {
-		spotLightB.penumbra = e;
-	});
-	spotBFolder.add(controls, 'spotBX', -100, 1600).onChange(function(e) {
-		spotLightB.position.set(e, controls.spotBY, controls.spotBZ);
-	});
-	spotBFolder.add(controls, 'spotBY', -30, 150).onChange(function(e) {
-		spotLightB.position.set(controls.spotBX, e, controls.spotBZ);
-	});
-	spotBFolder.add(controls, 'spotBZ', -100, 1600).onChange(function(e) {
-		spotLightB.position.set(controls.spotBX, controls.spotBY, e);
-	});
-
-	var spotCFolder = gui.addFolder("Spot Light C");
-	spotCFolder.add(controls, 'spotC').onChange(function(e) {
-		if (!e) {
-			spotLightC.intensity = 0;
-		} else {
-			spotLightC.intensity = controls.spotAIntesity;
-		}
-	});
-	spotCFolder.addColor(controls, 'spotCColor').onChange(function(e) {
-		spotLightC.color = new THREE.Color(e);
-	});
-	spotCFolder.add(controls, 'spotCIntesity', 0, 20).onChange(function(e) {
-		spotLightC.intensity = e;
-	});
-	spotCFolder.add(controls, 'spotCDistance', 0, 1500).onChange(function(e) {
-		spotLightC.distance = e;
-	});
-	spotCFolder.add(controls, 'spotCDecay', 0, 10).onChange(function(e) {
-		spotLightC.decay = e;
-	});
-	spotCFolder.add(controls, 'spotCAngle', 0, Math.PI/2).onChange(function(e) {
-		spotLightC.angle = e;
-	});
-	spotCFolder.add(controls, 'spotCPenumbra', 0, 1).onChange(function(e) {
-		spotLightC.penumbra = e;
-	});
-	spotCFolder.add(controls, 'spotCX', -100, 1600).onChange(function(e) {
-		spotLightC.position.set(e, controls.spotCY, controls.spotCZ);
-	});
-	spotCFolder.add(controls, 'spotCY', -30, 150).onChange(function(e) {
-		spotLightC.position.set(controls.spotCX, e, controls.spotCZ);
-	});
-	spotCFolder.add(controls, 'spotCZ', -100, 1600).onChange(function(e) {
-		spotLightC.position.set(controls.spotCX, controls.spotCY, e);
-	});
-
-	var spotDFolder = gui.addFolder("Spot Light D");
-	spotDFolder.add(controls, 'spotD').onChange(function(e) {
-		if (!e) {
-			spotLightD.intensity = 0;
-		} else {
-			spotLightD.intensity = controls.spotAIntesity;
-		}
-	});
-	spotDFolder.addColor(controls, 'spotDColor').onChange(function(e) {
-		spotLightD.color = new THREE.Color(e);
-	});
-	spotDFolder.add(controls, 'spotDIntesity', 0, 20).onChange(function(e) {
-		spotLightD.intensity = e;
-	});
-	spotDFolder.add(controls, 'spotDDistance', 0, 1500).onChange(function(e) {
-		spotLightD.distance = e;
-	});
-	spotDFolder.add(controls, 'spotDDecay', 0, 10).onChange(function(e) {
-		spotLightD.decay = e;
-	});
-	spotDFolder.add(controls, 'spotDAngle', 0, Math.PI/2).onChange(function(e) {
-		spotLightD.angle = e;
-	});
-	spotDFolder.add(controls, 'spotDPenumbra', 0, 1).onChange(function(e) {
-		spotLightD.penumbra = e;
-	});
-	spotDFolder.add(controls, 'spotDX', -100, 1600).onChange(function(e) {
-		spotLightD.position.set(e, controls.spotDY, controls.spotDZ);
-	});
-	spotDFolder.add(controls, 'spotDY', -30, 150).onChange(function(e) {
-		spotLightD.position.set(controls.spotDX, e, controls.spotDZ);
-	});
-	spotDFolder.add(controls, 'spotDZ', -100, 1600).onChange(function(e) {
-		spotLightD.position.set(controls.spotDX, controls.spotDY, e);
-	});
-
-	console.log(structureCount);
 	// ==============
 	// Render Section
 	// ==============
