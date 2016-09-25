@@ -25,17 +25,15 @@
 
 9. ~~Set up lighting for the city~~
 
-10. decorate buildings (map/particles/wireframe).
+10. ~~decorate buildings with phong material~~
 
-11. Perhaps add fog???
-
-12. Add music to sequence of camera movements/music visualization
+11. ~~Add music to sequence of camera movements/music visualization~~
 
 **Sat 9/24**
 
-13. Post processing: Work on Depth of Field
+12. Post processing: Work on Depth of Field
 
-14. Post processing: Work on grain
+13. Post processing: Work on grain
 
-15. Post processing: Work on advanced shaders
+14. Post processing: Work on lens flare
 
