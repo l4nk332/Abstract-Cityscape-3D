@@ -35,5 +35,5 @@
 
 13. Post processing: Work on grain
 
-14. Post processing: Work on lens flare
+14. ~~Post processing: Work on lens flare~~
 
