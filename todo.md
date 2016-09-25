@@ -31,9 +31,5 @@
 
 **Sat 9/24**
 
-12. Post processing: Work on Depth of Field
-
-13. Post processing: Work on grain
-
-14. ~~Post processing: Work on lens flare~~
+12. ~~Post processing: Work on lens flare~~
 
