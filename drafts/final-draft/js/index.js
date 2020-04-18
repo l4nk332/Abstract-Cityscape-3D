@@ -35,6 +35,7 @@ function keyPressFunctions(event) {
 	}
 
 	if (event.keyCode == 48) {
+    audioCtx.resume();
 		if (audio.paused) {
 			audio.play();
 		} else {
