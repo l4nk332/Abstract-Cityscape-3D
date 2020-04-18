@@ -1,0 +1,56 @@
+body {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+}
+
+#WebGL-output {
+  height: 100vh;
+}
+
+.ac-container {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.ac-controls {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  color: #fafafa;
+  background: #3943B7;
+  width: calc(100% - 16px);
+  position: absolute;
+  left: 0;
+  bottom: calc(100vh - 100%);
+}
+
+.ac-loading {
+  font-weight: lighter;
+  color: #3943B7;
+  animation-name: colortrans;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+  animation-iteration-count: infinite;
+}
+
+@keyframes colortrans {
+  0% {
+    color: #3943B7;
+  }
+
+  100% {
+    color: #DB3069;
+  }
+}
